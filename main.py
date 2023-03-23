@@ -8,6 +8,9 @@ from aiohttp import web
 import aiohttp_cors
 import os
 import threading
+import datetime
+
+now_cats = []
 
 cred = credentials.Certificate("lab4_config.json")
 firebase_admin.initialize_app(cred)
@@ -38,7 +41,7 @@ routes = web.RouteTableDef()
 
 @routes.get('/get_cats')
 async def get_daily_cats(request: web.Request):
-    return web.json_response({"result" : "Hello world"})
+    return web.json_response({"result" : now_cats})
 
 app = web.Application()
 app.add_routes(routes)
@@ -66,7 +69,16 @@ def get_cats():
             url = "https://api.thecatapi.com/v1/images/search"
             querystring = {"mime_types":"gif","api_key":"live_BupBzo4KWFAtkDAYyKz7a4BcK63I0OuL1Dr7kD2myJyPLVQWQEhNgCkPo4SSmC4s"}
             response = requests.request("GET", url, params=querystring)
-            print(response.json()[0]['url'])
+            new_cat = {"current_time" : None, "url" : None}
+            now = datetime.datetime.now()
+            new_cat["current_time"] = str(now.hour) + ":" + str(now.minute)
+            new_cat["url"] = response.json()[0]['url']
+            now_cats.append(new_cat)
+            print(new_cat)
+            message = messaging.Message(
+                topic="new_cat"
+            )
+            response = messaging.send(message)
         time.sleep(60)
 
 t1 = threading.Thread(target=run_web_app, daemon=True)
