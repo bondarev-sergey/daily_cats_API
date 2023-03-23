@@ -6,6 +6,7 @@ import random
 import time
 from aiohttp import web
 import aiohttp_cors
+import os
 
 cred = credentials.Certificate("lab4_config.json")
 firebase_admin.initialize_app(cred)
@@ -53,7 +54,7 @@ cors = aiohttp_cors.setup(app, defaults={
 for route in list(app.router.routes()):
     cors.add(route)
 
-web.run_app(app)
+web.run_app(app, port=os.getenv("PORT", default=5000))
 
 for _ in range(10):
     probability = random.random()
