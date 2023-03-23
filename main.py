@@ -37,9 +37,9 @@ def append_new_cat():
     url = "https://api.thecatapi.com/v1/images/search"
     querystring = {"mime_types":"gif","api_key":"live_BupBzo4KWFAtkDAYyKz7a4BcK63I0OuL1Dr7kD2myJyPLVQWQEhNgCkPo4SSmC4s"}
     response = requests.request("GET", url, params=querystring)
-    new_cat = {"current_time" : None, "url" : None}
+    new_cat = {"time" : None, "url" : None}
     now = datetime.datetime.now()
-    new_cat["current_time"] = str(now.hour) + ":" + str(now.minute)
+    new_cat["time"] = now.strftime("%H:%M")
     new_cat["url"] = response.json()[0]['url']
     now_cats.append(new_cat)
     print(new_cat)
