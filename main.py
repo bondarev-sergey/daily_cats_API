@@ -4,7 +4,6 @@ from firebase_admin import credentials
 from firebase_admin import messaging
 import random
 import time
-import flask_cors
 from aiohttp import web
 import aiohttp_cors
 
