@@ -67,7 +67,7 @@ for route in list(app.router.routes()):
 def get_cats():
     while True:
         probability = random.random()
-        if probability < 0.007:
+        if probability < 0.016:
             append_new_cat()
         time.sleep(60)
 
