@@ -53,7 +53,7 @@ cors = aiohttp_cors.setup(app, defaults={
 for route in list(app.router.routes()):
     cors.add(route)
 
-web.run_app(app, port=8080, access_log=None)
+web.run_app(app)
 
 for _ in range(10):
     probability = random.random()
