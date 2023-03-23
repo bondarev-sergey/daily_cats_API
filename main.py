@@ -81,12 +81,10 @@ def get_cats():
             response = messaging.send(message)
         time.sleep(60)
 
-t1 = threading.Thread(target=run_web_app, daemon=True)
-t2 = threading.Thread(target=get_cats, daemon=True)
+t1 = threading.Thread(target=run_web_app)
+t2 = threading.Thread(target=get_cats)
 t1.start()
 t2.start()
-t1.join()
-t2.join()
 
 
 
