@@ -12,6 +12,7 @@ import datetime
 
 now_cats = []
 
+
 cred = credentials.Certificate("lab4_config.json")
 firebase_admin.initialize_app(cred)
 
@@ -30,12 +31,23 @@ response = messaging.subscribe_to_topic(registration_tokens, "new_cat")
 print(response.success_count, 'tokens were subscribed successfully')
 
 # my_notification = messaging.Notification(title="У нас новый кот!", body="У нас новый кот!", image="https://lh3.google.com/u/0/ogw/AAEL6si5OxViDmgZ09EmM2BRji0wiVSGZexwFbPCG3bp=s32-c-mo%22")
-message = messaging.Message(
-    topic="new_cat"
-)
-response = messaging.send(message)
-# Response is a message ID string.
-print('Successfully sent message:', response)
+
+
+def append_new_cat():
+    url = "https://api.thecatapi.com/v1/images/search"
+    querystring = {"mime_types":"gif","api_key":"live_BupBzo4KWFAtkDAYyKz7a4BcK63I0OuL1Dr7kD2myJyPLVQWQEhNgCkPo4SSmC4s"}
+    response = requests.request("GET", url, params=querystring)
+    new_cat = {"current_time" : None, "url" : None}
+    now = datetime.datetime.now()
+    new_cat["current_time"] = str(now.hour) + ":" + str(now.minute)
+    new_cat["url"] = response.json()[0]['url']
+    now_cats.append(new_cat)
+    print(new_cat)
+    message = messaging.Message(
+        topic="new_cat"
+    )
+    response = messaging.send(message)
+    print(response)
 
 routes = web.RouteTableDef()
 
@@ -59,33 +71,19 @@ cors = aiohttp_cors.setup(app, defaults={
 for route in list(app.router.routes()):
     cors.add(route)
 
-def run_web_app():
-    web.run_app(app, port=os.getenv("PORT", default=5000))
-
 
 def get_cats():
     while True:
         probability = random.random()
         if probability < 0.007:
-            url = "https://api.thecatapi.com/v1/images/search"
-            querystring = {"mime_types":"gif","api_key":"live_BupBzo4KWFAtkDAYyKz7a4BcK63I0OuL1Dr7kD2myJyPLVQWQEhNgCkPo4SSmC4s"}
-            response = requests.request("GET", url, params=querystring)
-            new_cat = {"current_time" : None, "url" : None}
-            now = datetime.datetime.now()
-            new_cat["current_time"] = str(now.hour) + ":" + str(now.minute)
-            new_cat["url"] = response.json()[0]['url']
-            now_cats.append(new_cat)
-            print(new_cat)
-            message = messaging.Message(
-                topic="new_cat"
-            )
-            response = messaging.send(message)
+            append_new_cat()
         time.sleep(60)
 
-t1 = threading.Thread(target=run_web_app)
+
 t2 = threading.Thread(target=get_cats)
-t1.start()
 t2.start()
 
 
+append_new_cat()
 
+web.run_app(app, port=os.getenv("PORT", default=5000))
