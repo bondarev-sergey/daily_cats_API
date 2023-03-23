@@ -7,6 +7,7 @@ import time
 from aiohttp import web
 import aiohttp_cors
 import os
+import threading
 
 cred = credentials.Certificate("lab4_config.json")
 firebase_admin.initialize_app(cred)
@@ -54,14 +55,26 @@ cors = aiohttp_cors.setup(app, defaults={
 for route in list(app.router.routes()):
     cors.add(route)
 
-web.run_app(app, port=os.getenv("PORT", default=5000))
+def run_web_app():
+    web.run_app(app, port=os.getenv("PORT", default=5000))
 
-for _ in range(10):
-    probability = random.random()
-    if probability > 0.75:
-        url = "https://api.thecatapi.com/v1/images/search"
-        querystring = {"mime_types":"gif","api_key":"live_BupBzo4KWFAtkDAYyKz7a4BcK63I0OuL1Dr7kD2myJyPLVQWQEhNgCkPo4SSmC4s"}
-        response = requests.request("GET", url, params=querystring)
-        print(response.json()[0]['url'])
-    time.sleep(1)
+
+def get_cats():
+    while True:
+        probability = random.random()
+        if probability < 0.007:
+            url = "https://api.thecatapi.com/v1/images/search"
+            querystring = {"mime_types":"gif","api_key":"live_BupBzo4KWFAtkDAYyKz7a4BcK63I0OuL1Dr7kD2myJyPLVQWQEhNgCkPo4SSmC4s"}
+            response = requests.request("GET", url, params=querystring)
+            print(response.json()[0]['url'])
+        time.sleep(60)
+
+t1 = threading.Thread(target=run_web_app, daemon=True)
+t2 = threading.Thread(target=get_cats, daemon=True)
+t1.start()
+t2.start()
+t1.join()
+t2.join()
+
+
 
