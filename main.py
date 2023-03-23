@@ -16,22 +16,16 @@ now_cats = []
 cred = credentials.Certificate("lab4_config.json")
 firebase_admin.initialize_app(cred)
 
-# These registration tokens come from the client FCM SDKs.
+
 registration_tokens = [
     'd36W6hxtkb90YboQJ4T0Mk:APA91bHpQ8uMmo6fx1o1akomEXVZ6Qm6q_7ScuJYGY8eAFgiDxBq-QWr2sAJEcuIf1pCH2_dzsHla3JadnBONnFMQ3C7C0cVUQ1ffnHs4o4MrAonS2XvXnAknbnYnTAAi3V0Ahv-Cdjb',
     'dfCj9-l5G-2GUdl9iSedaK:APA91bEVg9ypr-Uve46NFPxQG4F-8Ak1m5cZb6jkYHoZUaNOEiEbUYpMNCzTiV2EOMDG7s9cbpHc4AikUvuQJKumSFAJ7_djbBU61WD_t3aILdUAxJvqPZaCZs0RpDUSoL6AZj35OqHv',
     'enPq8QQBxTqnmZgSGPgvkW:APA91bEqO4nVELFTp0HYLG6fUzvu6-aor-j7Iuwnjteo3BC9A8v0OaKthH9g8dECs1sqXU1zitNFtyU98EciKqK5rgFPJsxDfhANO_MBQhd0yOf7TUvsX9wlPAD30CG9NeOswU-Tz8df'
 ]
 
-# Subscribe the devices corresponding to the registration tokens to the
-# topic.
+
 response = messaging.subscribe_to_topic(registration_tokens, "new_cat")
-# See the TopicManagementResponse reference documentation
-# for the contents of response.
 print(response.success_count, 'tokens were subscribed successfully')
-
-# my_notification = messaging.Notification(title="У нас новый кот!", body="У нас новый кот!", image="https://lh3.google.com/u/0/ogw/AAEL6si5OxViDmgZ09EmM2BRji0wiVSGZexwFbPCG3bp=s32-c-mo%22")
-
 
 def append_new_cat():
     url = "https://api.thecatapi.com/v1/images/search"
@@ -67,10 +61,8 @@ cors = aiohttp_cors.setup(app, defaults={
 })
 
 
-# Configure CORS on all routes.
 for route in list(app.router.routes()):
     cors.add(route)
-
 
 def get_cats():
     while True:
